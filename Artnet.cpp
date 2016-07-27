@@ -25,7 +25,7 @@ THE SOFTWARE.
 #include <Artnet.h>
 #include <ESP8266WiFi.h>
 
-Artnet::Artnet() {}
+Artnet::Artnet() : net(0), subNet(0) {}
 
 void Artnet::begin()
 {
@@ -86,10 +86,15 @@ uint16_t Artnet::read()
         
         memset(ArtPollReply.goodinput,  0x08, 4);
         memset(ArtPollReply.goodoutput,  0x80, 4);
-        memset(ArtPollReply.porttypes,  0xc0, 4);
+        
+        ArtPollReply.porttypes[0] = 0x80; //read only
+        ArtPollReply.porttypes[1] = 0x00; //not used
+        ArtPollReply.porttypes[2] = 0x00; //not used
+        ArtPollReply.porttypes[3] = 0x00; //not used
 
         uint8_t shortname [18];
         uint8_t longname [64];
+        
         sprintf((char *)shortname, "artnet arduino\0");
         sprintf((char *)longname, "Art-Net -> Arduino Bridge\0");
         memcpy(ArtPollReply.shortname, shortname, sizeof(shortname));
@@ -99,8 +104,8 @@ uint16_t Artnet::read()
         ArtPollReply.etsaman[1] = 0;
         ArtPollReply.verH       = 1;
         ArtPollReply.ver        = 0;
-        ArtPollReply.subH       = 0;
-        ArtPollReply.sub        = 0;
+        ArtPollReply.subH       = net;
+        ArtPollReply.sub        = subNet;
         ArtPollReply.oemH       = 0;
         ArtPollReply.oem        = 0xFF;
         ArtPollReply.ubea       = 0;
@@ -111,7 +116,7 @@ uint16_t Artnet::read()
         ArtPollReply.style      = 0;   
 
         ArtPollReply.numbportsH = 0;
-        ArtPollReply.numbports  = 4;
+        ArtPollReply.numbports  = 1;
         ArtPollReply.status2    = 0x08;
 
         ArtPollReply.bindip[0] = node_ip_address[0];
@@ -119,14 +124,22 @@ uint16_t Artnet::read()
         ArtPollReply.bindip[2] = node_ip_address[2];
         ArtPollReply.bindip[3] = node_ip_address[3];
 
-        uint8_t swin[4]  = {0x01,0x02,0x03,0x04};
-        uint8_t swout[4] = {0x01,0x02,0x03,0x04};
-        for(uint8_t i = 0; i <= 4; i++)
+        uint8_t swin[4]  = {0x00,0x00,0x00,0x00};//we can't send packages anyway
+        for(uint8_t i = 0; i < 4; i++)
         {
-            ArtPollReply.swout[i] = swout[i];
             ArtPollReply.swin[i] = swin[i];
         }
+        
+        ArtPollReply.swout[0] = universe_a;
+        ArtPollReply.swout[1] = 0x00; //dissabled anyway
+        ArtPollReply.swout[2] = 0x00; //dissabled anyway
+        ArtPollReply.swout[3] = 0x00; //dissabled anyway
+        
+        
         sprintf((char *)ArtPollReply.nodereport, "%i DMX output universes active.\0", ArtPollReply.numbports);  
+        
+        WiFi.macAddress(ArtPollReply.mac); //sets the mac adress
+        
         Udp.beginPacket(broadcast, ART_NET_PORT);//send the packet to the broadcast address
         Udp.write((uint8_t *)&ArtPollReply, sizeof(ArtPollReply));
         Udp.endPacket();
@@ -161,4 +174,16 @@ void Artnet::printPacketContent()
     Serial.print("  ");
   }
   Serial.println('\n');
+}
+
+void Artnet::setNet(uint8_t n){
+    net = n;
+}
+
+void Artnet::setSubnet(uint8_t n){
+    subNet = n;
+}
+
+void Artnet::setUniverseA(uint8_t u){
+    universe_a = u;
 }
