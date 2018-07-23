@@ -66,10 +66,12 @@ uint16_t Artnet::read()
       if (opcode == ART_POLL)
       {
         //fill the reply struct, and then send it to the network's broadcast address
+          /*
         Serial.print("POLL from ");
         Serial.print(artnetServer);
         Serial.print(" broadcast addr: ");
         Serial.println(broadcast);
+        */
 
         IPAddress local_ip = WiFi.localIP();
         node_ip_address[0] = local_ip[0];
