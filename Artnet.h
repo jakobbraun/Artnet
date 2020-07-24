@@ -78,6 +78,7 @@ struct artnet_reply_s {
   uint8_t  filler[26];
 } __attribute__((packed));
 
+
 class Artnet
 {
 public:
@@ -124,7 +125,9 @@ public:
   void setNet(uint8_t n);
   void setSubnet(uint8_t n);
   void setUniverseA(uint8_t u);
+  void setNumUniverses(uint8_t num);
   
+  uint16_t send(uint16_t outgoingUniverse, uint8_t* data, uint16_t data_length, IPAddress destIp);
 
 private:
   uint8_t  node_ip_address[4];
@@ -141,8 +144,11 @@ private:
   
   uint8_t subNet;
   uint8_t net;
+  uint8_t numUniverses;
   uint8_t universe_a;
   void (*artDmxCallback)(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data);
+  static const char artnetId[];
+  
 };
 
 #endif
