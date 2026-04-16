@@ -40,44 +40,44 @@ THE SOFTWARE.
 #define ART_NET_ID "Art-Net\0"
 #define ART_DMX_START 18
 
-struct artnet_reply_s {
-  uint8_t  id[8];
+struct artnet_reply_s
+{
+  uint8_t id[8];
   uint16_t opCode;
-  uint8_t  ip[4];
+  uint8_t ip[4];
   uint16_t port;
-  uint8_t  verH;
-  uint8_t  ver;
-  uint8_t  subH;
-  uint8_t  sub;
-  uint8_t  oemH;
-  uint8_t  oem;
-  uint8_t  ubea;
-  uint8_t  status;
-  uint8_t  etsaman[2];
-  uint8_t  shortname[18];
-  uint8_t  longname[64];
-  uint8_t  nodereport[64];
-  uint8_t  numbportsH;
-  uint8_t  numbports;
-  uint8_t  porttypes[4];//max of 4 ports per node
-  uint8_t  goodinput[4];
-  uint8_t  goodoutput[4];
-  uint8_t  swin[4];
-  uint8_t  swout[4];
-  uint8_t  swvideo;
-  uint8_t  swmacro;
-  uint8_t  swremote;
-  uint8_t  sp1;
-  uint8_t  sp2;
-  uint8_t  sp3;
-  uint8_t  style;
-  uint8_t  mac[6];
-  uint8_t  bindip[4];
-  uint8_t  bindindex;
-  uint8_t  status2;
-  uint8_t  filler[26];
+  uint8_t verH;
+  uint8_t ver;
+  uint8_t subH;
+  uint8_t sub;
+  uint8_t oemH;
+  uint8_t oem;
+  uint8_t ubea;
+  uint8_t status;
+  uint8_t etsaman[2];
+  uint8_t shortname[18];
+  uint8_t longname[64];
+  uint8_t nodereport[64];
+  uint8_t numbportsH;
+  uint8_t numbports;
+  uint8_t porttypes[4]; // max of 4 ports per node
+  uint8_t goodinput[4];
+  uint8_t goodoutput[4];
+  uint8_t swin[4];
+  uint8_t swout[4];
+  uint8_t swvideo;
+  uint8_t swmacro;
+  uint8_t swremote;
+  uint8_t sp1;
+  uint8_t sp2;
+  uint8_t sp3;
+  uint8_t style;
+  uint8_t mac[6];
+  uint8_t bindip[4];
+  uint8_t bindindex;
+  uint8_t status2;
+  uint8_t filler[26];
 } __attribute__((packed));
-
 
 class Artnet
 {
@@ -91,14 +91,9 @@ public:
   void printPacketContent();
 
   // Return a pointer to the start of the DMX data
-  inline uint8_t* getDmxFrame(void)
+  inline uint8_t *getDmxFrame(void)
   {
     return artnetPacket + ART_DMX_START;
-  }
-
-  inline uint16_t getOpcode(void)
-  {
-    return opcode;
   }
 
   inline uint8_t getSequence(void)
@@ -114,41 +109,38 @@ public:
   inline uint16_t getLength(void)
   {
     return dmxDataLength;
-  } 
+  }
 
-  inline void setArtDmxCallback(void (*fptr)(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data)) 
+  inline void setArtDmxCallback(void (*fptr)(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t *data))
   {
     artDmxCallback = fptr;
   }
-  
-  
+
   void setNet(uint8_t n);
   void setSubnet(uint8_t n);
   void setUniverseA(uint8_t u);
   void setNumUniverses(uint8_t num);
-  
-  uint16_t send(uint16_t outgoingUniverse, uint8_t* data, uint16_t data_length, IPAddress destIp);
+
+  uint16_t send(uint16_t outgoingUniverse, uint8_t *data, uint16_t data_length, IPAddress destIp);
 
 private:
-  uint8_t  node_ip_address[4];
-  uint8_t  id[8];
+  uint8_t node_ip_address[4];
+  uint8_t id[8];
   WiFiUDP Udp;
   struct artnet_reply_s ArtPollReply;
   uint8_t artnetPacket[MAX_BUFFER_ARTNET];
   uint16_t packetSize;
   IPAddress broadcast;
-  uint16_t opcode;
   uint8_t sequence;
   uint16_t incomingUniverse;
   uint16_t dmxDataLength;
-  
+
   uint8_t subNet;
   uint8_t net;
   uint8_t numUniverses;
   uint8_t universe_a;
-  void (*artDmxCallback)(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data);
+  void (*artDmxCallback)(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t *data);
   static const char artnetId[];
-  
 };
 
 #endif
